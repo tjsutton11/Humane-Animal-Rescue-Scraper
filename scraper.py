@@ -6,6 +6,7 @@ import cssutils
 import os
 import tweepy
 import time
+import schedule
 
 URL = 'https://www.humaneanimalrescue.org/available-pets/'
 
@@ -101,16 +102,24 @@ def o_auth():
         return None
 
 
-web_scrape = scrape_site()
-adopt = choose_random_pet(web_scrape)
-retrieve_photo(adopt)
+def run():
+    web_scrape = scrape_site()
+    adopt = choose_random_pet(web_scrape)
+    retrieve_photo(adopt)
 
-# Authenticates user and passes that to Twitter's API
-authentication = o_auth()
-api = tweepy.API(authentication)
+    # Authenticates user and passes that to Twitter's API
+    authentication = o_auth()
+    api = tweepy.API(authentication)
 
-# Posts a tweet that includes the pet name, age, gender, breed, location, and link
-api.update_with_media('pet_photo.jpg', 'Name: ' + adopt.name + '\n' + adopt.age + '\n' + adopt.gender + '\n'
-                      + adopt.breed + '\n' + adopt.location + '\n' + 'Link: ' + adopt.link + '\n' + '#adopt #pittsburgh')
-print('A pet has been posted!')
+    # Posts a tweet that includes the pet name, age, gender, breed, location, and link
+    api.update_with_media('pet_photo.jpg', 'Name: ' + adopt.name + '\n' + adopt.age + '\n' + adopt.gender + '\n'
+                          + adopt.breed + '\n' + adopt.location + '\n' + 'Link: ' + adopt.link + '\n'
+                          + '#adoptpgh #pittsburgh')
+    print('A pet has been posted!')
 
+
+schedule.every(4).hours.do(run)
+
+while True:
+    schedule.run_pending()
+    time.sleep(1)
